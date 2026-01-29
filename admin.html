@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Thirumagal Coffee House</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container { padding: 20px; max-width: 800px; margin: auto; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: var(--primary); color: white; padding: 20px; border-radius: 15px; text-align: center; }
+        .filter-section { background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px; display: flex; gap: 10px; align-items: center; overflow-x: auto;}
+        .order-table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; }
+        .order-table th, .order-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+        .status-success { color: var(--accent); font-weight: bold; }
+        .status-failed { color: #d32f2f; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="login-block" class="admin-container" style="text-align: center; margin-top: 100px;">
+        <h2>Admin Login</h2>
+        <input type="text" id="adminUser" placeholder="Username" style="padding: 12px; width: 80%; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd;">
+        <input type="password" id="adminPass" placeholder="Password" style="padding: 12px; width: 80%; margin-bottom: 20px; border-radius: 10px; border: 1px solid #ddd;">
+        <button onclick="checkLogin()" class="checkout-btn" style="width: 85%;">Login</button>
+    </div>
+
+    <div id="dashboard-block" class="admin-container" style="display: none;">
+        <header style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Sales Dashboard</h2>
+            <button onclick="location.reload()" style="background:none; border:none; text-decoration: underline; color:#666;">Logout</button>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card"><h3>Total Sales</h3><p id="grandTotal">₹0</p></div>
+            <div class="stat-card"><h3>Orders</h3><p id="orderCount">0</p></div>
+        </div>
+
+        <div class="filter-section">
+    <button onclick="setQuickDate(0)" class="cancel-all-btn" style="padding:10px; flex:1;">Today</button>
+    <button onclick="setQuickDate(1)" class="cancel-all-btn" style="padding:10px; flex:1;">Yesterday</button>
+    <input type="date" id="dateFilter" onchange="loadOrders()" style="flex:2; padding:8px; border-radius:10px; border:1px solid #ddd;">
+</div>
+
+        <table class="order-table">
+            <thead>
+                <tr>
+                    <th>Date/Time</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="orderLog">
+                </tbody>
+        </table>
+    </div>
+
+   <script>
+        function checkLogin() {
+            const u = document.getElementById('adminUser').value;
+            const p = document.getElementById('adminPass').value;
+            // Your credentials
+            if(u === "admin" && p === "cafe123") {
+                document.getElementById('login-block').style.display = 'none';
+                document.getElementById('dashboard-block').style.display = 'block';
+                
+                // Set default date to Today in the calendar picker
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('dateFilter').value = today;
+                
+                loadOrders();
+            } else { alert("Invalid Credentials"); }
+        }
+
+        function loadOrders() {
+            const orders = JSON.parse(localStorage.getItem('cafeOrders') || '[]');
+            filterOrders(orders);
+        }
+
+        function filterOrders(allOrders) {
+            // If no data passed, grab from storage
+            const data = allOrders || JSON.parse(localStorage.getItem('cafeOrders') || '[]');
+            
+            // Get the date selected in the calendar (Format: YYYY-MM-DD)
+            const selectedDateValue = document.getElementById('dateFilter').value;
+            if (!selectedDateValue) return;
+
+            // Convert selected calendar date to match our saved format (MM/DD/YYYY or DD/MM/YYYY)
+            const selectedDate = new Date(selectedDateValue).toLocaleDateString();
+
+            const filtered = data.filter(order => order.date === selectedDate);
+            renderTable(filtered);
+        }
+
+        function renderTable(data) {
+            const log = document.getElementById('orderLog');
+            let totalSales = 0;
+            
+            if (data.length === 0) {
+                log.innerHTML = `<tr><td colspan="4" style="text-align:center;">No orders found for this date.</td></tr>`;
+                document.getElementById('grandTotal').innerText = `₹0`;
+                document.getElementById('orderCount').innerText = "0";
+                return;
+            }
+
+            log.innerHTML = data.map(o => {
+                // Only sum up "Success" orders for the Total Sales count
+                if(o.status === 'Success') {
+                    totalSales += parseInt(o.amount);
+                }
+                
+                return `<tr>
+                    <td>${o.time}</td>
+                    <td>${o.items}</td>
+                    <td>₹${o.amount}</td>
+                    <td class="status-${o.status.toLowerCase()}">${o.status}</td>
+                </tr>`;
+            }).join('');
+
+            document.getElementById('grandTotal').innerText = `₹${totalSales}`;
+            document.getElementById('orderCount').innerText = data.length;
+        }
+
+        // Quick buttons logic
+        function setQuickDate(daysAgo) {
+            const date = new Date();
+            date.setDate(date.getDate() - daysAgo);
+            const dateString = date.toISOString().split('T')[0];
+            document.getElementById('dateFilter').value = dateString;
+            loadOrders();
+        }
+    </script>
+</body>
+</html>
