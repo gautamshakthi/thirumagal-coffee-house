@@ -64,7 +64,21 @@ menuItems.forEach(item => {
 function updateQty(id, change) {
     cart[id] = (cart[id] || 0) + change;
     if (cart[id] < 0) cart[id] = 0;
-    document.getElementById(`qty-${id}`).innerText = cart[id];
+
+    const countElement = document.getElementById(`qty-${id}`);
+    if (countElement) {
+        countElement.innerText = cart[id];
+        
+        // Mobile Fix: Force the browser to show the update
+        countElement.style.display = 'none';
+        countElement.offsetHeight; // Trigger reflow
+        countElement.style.display = 'inline-block';
+        
+        // Add a "Pulse" color change when it updates
+        countElement.style.color = "#ffffff";
+        setTimeout(() => { countElement.style.color = "#ffd700"; }, 200);
+    }
+    
     calculateTotal();
 }
 

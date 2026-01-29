@@ -52,23 +52,42 @@ body {
     object-fit: cover; border-radius: 15px;
 }
 
+/* Updated for Mobile Visibility */
 .qty-controller {
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     background: var(--espresso);
-    border-radius: 50px; margin-top: 10px; padding: 4px;
+    border-radius: 50px;
+    margin-top: 10px;
+    padding: 2px;
+    height: 36px; /* Fixed height so it doesn't collapse on mobile */
+    min-width: 100px;
 }
 
 .qty-count {
-    color: var(--crema);
-    font-weight: 800; font-size: 1.1rem;
-    min-width: 25px; text-align: center;
+    color: #ffd700; /* Using a Bright Gold for maximum visibility on mobile */
+    font-weight: 800;
+    font-size: 1.2rem; /* Slightly larger for small screens */
+    min-width: 30px; 
+    text-align: center;
+    display: inline-block;
+    line-height: 1; /* Centers the number vertically */
 }
 
 .btn-qty {
-    width: 32px; height: 32px;
-    border-radius: 50%; border: none;
-    background: var(--crema); color: var(--espresso);
-    font-weight: bold; font-size: 1.2rem;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0; /* Prevents the button from becoming an oval on mobile */
+    border-radius: 50%;
+    border: none;
+    background: var(--crema);
+    color: var(--espresso);
+    font-weight: bold;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .checkout-bar {
