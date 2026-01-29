@@ -9,60 +9,46 @@
     --glass: rgba(255, 255, 255, 0.9);
 }
 
-/* Base Setup */
+/* Base Setup & Coffee Theme */
 html, body {
     height: 100%;
     margin: 0;
     background-color: var(--bg-cream);
-    /* High-quality subtle coffee pattern */
     background-image: url('https://www.transparenttextures.com/patterns/coffee-beans-with-coffee-beans.png');
     font-family: 'Poppins', -apple-system, sans-serif;
     color: var(--espresso);
+    scroll-behavior: smooth;
 }
 
 body {
     min-height: 100svh;
-    margin: 0;
-    /* This padding-bottom is key: it must be taller than the checkout bar */
-    padding-bottom: 180px; 
-    box-sizing: border-box;
-    background-color: var(--bg-cream);
-    background-image: url('https://www.transparenttextures.com/patterns/coffee-beans-with-coffee-beans.png');
-    font-family: 'Poppins', sans-serif;
+    /* Massive padding ensures the last row of items sits ABOVE the bar */
+    padding-bottom: 200px; 
 }
 
-/* Make the grid more compact to fit more items */
+/* Dashing Item Grid */
 .menu-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    padding: 15px;
-    /* Ensure nothing gets stuck behind the bar */
-    margin-bottom: 20px; 
+    gap: 16px;
+    padding: 20px;
+    animation: fadeIn 0.8s ease;
 }
 
-/* Dashing Item Cards */
 .item-card {
     background: var(--glass);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: 24px;
     padding: 10px;
     box-shadow: 0 10px 25px rgba(92, 61, 46, 0.12);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    text-align: center;
 }
 
-.item-card:active {
-    transform: scale(0.95);
-}
-
-.item-img {
-    width: 100%;
-    height: 110px;
-    object-fit: cover;
-    border-radius: 18px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
+.item-card:active { transform: scale(0.95); }
 
 .price-tag {
     position: absolute;
@@ -70,14 +56,21 @@ body {
     right: 12px;
     background: linear-gradient(135deg, var(--latte), var(--roast));
     color: white;
-    padding: 5px 12px;
-    border-radius: 12px;
+    padding: 4px 10px;
+    border-radius: 10px;
     font-weight: 800;
-    font-size: 0.85rem;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    font-size: 0.8rem;
+    z-index: 5;
 }
 
-/* Stylish Pill Controllers */
+.item-img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 18px;
+}
+
+/* Stylish Controller */
 .qty-controller {
     display: flex;
     align-items: center;
@@ -97,65 +90,43 @@ body {
     color: var(--espresso);
     font-weight: bold;
     font-size: 1.2rem;
-    cursor: pointer;
-    transition: background 0.2s;
 }
 
-.btn-qty:active {
-    background: var(--white);
-}
-
-#qty-text { color: var(--white); font-weight: bold; }
-
-/* The Fixed "Compact" Checkout Bar */
+/* Floating "Dashing" Checkout Bar */
 .checkout-bar {
     position: fixed;
-    bottom: 15px; /* Slightly closer to the bottom edge */
-    left: 15px;
-    right: 15px;
-    background: var(--espresso);
-    border-radius: 20px;
-    padding: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: rgba(45, 36, 36, 0.98);
+    backdrop-filter: blur(10px);
+    border-radius: 25px;
+    padding: 18px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
     display: flex;
     flex-direction: column;
     z-index: 1000;
-    /* Adding a slight transparency so it looks lighter */
-    background: rgba(45, 36, 36, 0.98);
-    backdrop-filter: blur(5px);
+    border: 1px solid rgba(224, 192, 151, 0.2);
 }
 
 .total-info {
     display: flex;
     justify-content: space-between;
     color: var(--crema);
-    font-weight: 600;
-    font-size: 1rem;
-    margin-bottom: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
 }
 
 .checkout-btn {
-    padding: 12px; /* Reduced padding for a sleeker look */
-    font-size: 0.9rem;
+    background: linear-gradient(135deg, var(--latte), #d35400);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-/* Glassmorphism Status Card */
-.payment-card {
-    background: var(--white);
-    border-radius: 35px 35px 0 0;
-    padding: 30px;
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
-}
-
-.receipt-box {
-    background: #fdfaf7;
-    border: 2px dashed var(--crema);
-    border-radius: 20px;
-    padding: 20px;
-    margin: 20px 0;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

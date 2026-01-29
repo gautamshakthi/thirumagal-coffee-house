@@ -8,24 +8,21 @@ const CAFE_NAME = "Thirumagal Coffee House";
 let isPaymentPending = false;
 let pendingAmount = 0;
 
-// Function for a crisp 'Zing' sound
+// Function for a sharp 'Zing' sound
 function playZingSound() {
-    const context = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = context.createOscillator();
-    const gainNode = context.createGain();
-
-    oscillator.type = 'triangle'; // Smoother than sine for a 'Zing'
-    oscillator.frequency.setValueAtTime(1500, context.currentTime); 
-    oscillator.frequency.exponentialRampToValueAtTime(1000, context.currentTime + 0.1); 
-
-    gainNode.gain.setValueAtTime(0.15, context.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1);
-
-    oscillator.connect(gainNode);
-    gainNode.connect(context.destination);
-
-    oscillator.start();
-    oscillator.stop(context.currentTime + 0.15);
+    try {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = context.createOscillator();
+        const gainNode = context.createGain();
+        oscillator.type = 'triangle';
+        oscillator.frequency.setValueAtTime(1500, context.currentTime); 
+        oscillator.frequency.exponentialRampToValueAtTime(1000, context.currentTime + 0.1); 
+        gainNode.gain.setValueAtTime(0.1, context.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1);
+        oscillator.connect(gainNode);
+        gainNode.connect(context.destination);
+        oscillator.start(); oscillator.stop(context.currentTime + 0.15);
+    } catch (e) { console.log("Sound blocked"); }
 }
 
 // ==========================================
@@ -70,16 +67,9 @@ function updateQty(id, change) {
     cart[id] = (cart[id] || 0) + change;
     if (cart[id] < 0) cart[id] = 0;
     document.getElementById(`qty-${id}`).innerText = cart[id];
-    
-    // Feedback: Make the total bounce slightly so they know it updated
-    const totalDisplay = document.getElementById('total-price');
-    totalDisplay.style.transform = "scale(1.2)";
-    setTimeout(() => totalDisplay.style.transform = "scale(1)", 200);
-    
     calculateTotal();
 }
 
-// Update the Checkout Button UI dynamically
 function calculateTotal() {
     let total = 0; let count = 0;
     menuItems.forEach(item => {
@@ -88,18 +78,8 @@ function calculateTotal() {
             count += cart[item.id];
         }
     });
-    
-    // Smoothly update text
-    const totalEl = document.getElementById('total-price');
-    const countEl = document.getElementById('item-count');
-    
-    totalEl.innerText = `₹${total}`;
-    countEl.innerText = `${count} Items Selected`;
-    
-    // Add a little "pop" animation to the bar when items change
-    const bar = document.querySelector('.checkout-bar');
-    bar.style.transform = "scale(1.02)";
-    setTimeout(() => bar.style.transform = "scale(1)", 100);
+    document.getElementById('total-price').innerText = `₹${total}`;
+    document.getElementById('item-count').innerText = `${count} Items`;
 }
 
 // ==========================================
@@ -148,33 +128,53 @@ function showVerificationModal(amount) {
     document.body.appendChild(overlay);
 }
 
-// Finalize Order with the new 'Zesty' UI
+// ... (Keep updateQty and calculateTotal as is)
+
 function finalizeOrder(amount) {
     playZingSound();
-    // ... (rest of your randomized ID and summary logic)
+    const orderID = "TH" + Math.floor(Math.random() * 9000 + 1000);
+    let itemHtml = ""; 
+    let whatsappList = "";
+
+    menuItems.forEach(item => {
+        const qty = cart[item.id] || 0;
+        if (qty > 0) {
+            const itemTotal = item.price * qty;
+            itemHtml += `<div class="summary-line" style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:5px;">
+                            <span>${item.eng} x ${qty}</span>
+                            <b>₹${itemTotal}</b>
+                         </div>`;
+            whatsappList += `• ${item.eng} (₹${item.price}) x ${qty} = ₹${itemTotal}\n`;
+        }
+    });
+
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('ID:'+orderID+'|Amt:'+amount)}`;
     
-    // Use the new Receipt UI colors
+    document.getElementById('verify-area').style.display = 'none';
     const res = document.getElementById('success-area');
+    res.style.display = 'block';
+
     res.innerHTML = `
-        <div class="success-ui">
-            <div class="check-icon" style="color:var(--success); font-size:80px;">✔</div>
-            <h2 style="color:var(--espresso); font-weight:900;">Order Verified!</h2>
-            <div class="receipt-box">
-                <p style="color:var(--latte); font-weight:bold;">TOKEN: #${orderID}</p>
+        <div class="success-ui" style="text-align:center; padding:10px;">
+            <div class="check-icon" style="font-size:60px; color:var(--success);">✅</div>
+            <h2 style="color:var(--espresso); margin-top:0;">Payment Verified!</h2>
+            <img src="${qrUrl}" style="width:140px; margin:10px auto; border-radius:15px; border:2px solid #eee;">
+            <div class="receipt-box" style="background:#fdfaf7; border:2px dashed var(--crema); padding:15px; border-radius:20px; text-align:left; margin-bottom:20px;">
+                <p style="font-weight:bold; color:var(--latte); margin-top:0;">Order #${orderID}</p>
                 ${itemHtml}
-                <div style="border-top:2px solid var(--crema); padding-top:10px; margin-top:10px; display:flex; justify-content:space-between; font-weight:900; font-size:1.2rem;">
-                    <span>PAID</span>
-                    <span>₹${amount}</span>
-                </div>
+                <hr style="border:0; border-top:1px solid #ddd; margin:10px 0;">
+                <p style="display:flex; justify-content:space-between; font-weight:bold; font-size:18px; margin:0;">
+                    <span>TOTAL</span>
+                    <span>₹${amount} ✅</span>
+                </p>
             </div>
-            <button onclick="sendWhatsAppReceipt('${orderID}', '${amount}', ${JSON.stringify(whatsappText)})" class="checkout-btn" style="width:100%; background:var(--espresso);">
-                Share Receipt
+            <button onclick="sendWhatsAppReceipt('${orderID}', '${amount}', ${JSON.stringify(whatsappList)})" class="checkout-btn" style="width:100%; background:var(--espresso);">
+                Share Receipt to WhatsApp
             </button>
         </div>
     `;
 
-
-    setTimeout(() => { sendWhatsAppReceipt(orderID, amount, whatsappText); }, 2500);
+    setTimeout(() => { sendWhatsAppReceipt(orderID, amount, whatsappList); }, 2500);
 }
 
 function sendWhatsAppReceipt(id, amt, items) {
@@ -185,17 +185,9 @@ function sendWhatsAppReceipt(id, amt, items) {
                         `--------------------------\n` +
                         `*TOTAL PAID: ₹${amt}* ✅\n` +
                         `--------------------------\n` +
-                        `_Generated at Thirumagal Coffee House_`;
+                        `_Generated by Thirumagal Coffee House_`;
 
     const encodedMsg = encodeURIComponent(fullMessage);
     const waUrl = `https://wa.me/${MY_PHONE}?text=${encodedMsg}`;
-    const newWindow = window.open(waUrl, '_blank');
-
-    if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-        const tip = document.getElementById('popup-tip');
-        if (tip) {
-            tip.style.display = 'block';
-            tip.innerHTML = `⚠️ <b>Popup Blocked:</b> Please click the blue button below to send the receipt!`;
-        }
-    }
+    window.open(waUrl, '_blank');
 }
