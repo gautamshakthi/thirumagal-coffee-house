@@ -8,7 +8,6 @@ const CAFE_NAME = "Thirumagal Coffee House";
 let isPaymentPending = false;
 let pendingAmount = 0;
 
-// Function for a sharp 'Zing' sound
 function playZingSound() {
     try {
         const context = new (window.AudioContext || window.webkitAudioContext)();
@@ -26,7 +25,7 @@ function playZingSound() {
 }
 
 // ==========================================
-// 2. MENU DATA
+// 2. MENU DATA & RENDERING
 // ==========================================
 const menuItems = [
     { id: 1, eng: "Tea", tam: "டீ", price: 15, img: "tea.jpg" },
@@ -56,10 +55,9 @@ menuItems.forEach(item => {
         </div>
         <div class="qty-controller">
             <button class="btn-qty" onclick="updateQty(${item.id}, -1)">−</button>
-            <span id="qty-${item.id}">0</span>
+            <span class="qty-count" id="qty-${item.id}">0</span>
             <button class="btn-qty" onclick="updateQty(${item.id}, 1)">+</button>
-        </div>
-    `;
+        </div>`;
     container.appendChild(card);
 });
 
@@ -83,7 +81,7 @@ function calculateTotal() {
 }
 
 // ==========================================
-// 3. PAYMENT & AUTO-DETECTION
+// 3. PAYMENT FLOW
 // ==========================================
 function processCheckout() {
     const total = document.getElementById('total-price').innerText.replace('₹', '');
@@ -97,7 +95,6 @@ function processCheckout() {
     window.location.href = upiLink;
 }
 
-// Auto-Detect Return from UPI App
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && isPaymentPending) {
         setTimeout(() => { 
@@ -117,18 +114,15 @@ function showVerificationModal(amount) {
             <div id="verify-area">
                 <div class="payment-icon">⌛</div>
                 <h3>Welcome Back!</h3>
-                <p>Complete your payment of <b>₹${amount}</b> in your bank app? Click below to get your receipt.</p>
+                <p>Did you pay <b>₹${amount}</b>? Click below for your receipt.</p>
                 <button onclick="finalizeOrder('${amount}')" class="checkout-btn" style="width:100%">I Have Paid Successfully</button>
                 <button onclick="location.reload()" class="close-link">Payment Failed / Cancel</button>
                 <div id="popup-tip" style="display:none; background:#fff3cd; color:#856404; padding:10px; border-radius:10px; font-size:13px; margin-top:15px; border:1px solid #ffeeba;"></div>
             </div>
             <div id="success-area" style="display:none;"></div>
-        </div>
-    `;
+        </div>`;
     document.body.appendChild(overlay);
 }
-
-// ... (Keep updateQty and calculateTotal as is)
 
 function finalizeOrder(amount) {
     playZingSound();
@@ -144,7 +138,7 @@ function finalizeOrder(amount) {
                             <span>${item.eng} x ${qty}</span>
                             <b>₹${itemTotal}</b>
                          </div>`;
-            whatsappList += `• ${item.eng} (₹${item.price}) x ${qty} = ₹${itemTotal}\n`;
+            whatsappList += `• ${item.eng} x ${qty} = ₹${itemTotal}\n`;
         }
     });
 
@@ -155,12 +149,12 @@ function finalizeOrder(amount) {
     res.style.display = 'block';
 
     res.innerHTML = `
-        <div class="success-ui" style="text-align:center; padding:10px;">
-            <div class="check-icon" style="font-size:60px; color:var(--success);">✅</div>
-            <h2 style="color:var(--espresso); margin-top:0;">Payment Verified!</h2>
+        <div class="success-ui" style="text-align:center;">
+            <div class="check-icon" style="font-size:60px; color:#27ae60;">✅</div>
+            <h2 style="color:#2d2424">Payment Verified!</h2>
             <img src="${qrUrl}" style="width:140px; margin:10px auto; border-radius:15px; border:2px solid #eee;">
-            <div class="receipt-box" style="background:#fdfaf7; border:2px dashed var(--crema); padding:15px; border-radius:20px; text-align:left; margin-bottom:20px;">
-                <p style="font-weight:bold; color:var(--latte); margin-top:0;">Order #${orderID}</p>
+            <div class="receipt-box" style="background:#fdfaf7; border:2px dashed #e0c097; padding:15px; border-radius:20px; text-align:left; margin-bottom:20px;">
+                <p style="font-weight:bold; color:#b85c38;">Order #${orderID}</p>
                 ${itemHtml}
                 <hr style="border:0; border-top:1px solid #ddd; margin:10px 0;">
                 <p style="display:flex; justify-content:space-between; font-weight:bold; font-size:18px; margin:0;">
@@ -168,26 +162,15 @@ function finalizeOrder(amount) {
                     <span>₹${amount} ✅</span>
                 </p>
             </div>
-            <button onclick="sendWhatsAppReceipt('${orderID}', '${amount}', ${JSON.stringify(whatsappList)})" class="checkout-btn" style="width:100%; background:var(--espresso);">
+            <button onclick='sendWhatsAppReceipt("${orderID}", "${amount}", ${JSON.stringify(whatsappList)})' class="checkout-btn" style="width:100%; background:#2d2424">
                 Share Receipt to WhatsApp
             </button>
-        </div>
-    `;
-
-    setTimeout(() => { sendWhatsAppReceipt(orderID, amount, whatsappList); }, 2500);
+        </div>`;
 }
 
 function sendWhatsAppReceipt(id, amt, items) {
-    const fullMessage = `✅ *PAYMENT SUCCESS*\n` +
-                        `--------------------------\n` +
-                        `*Order ID:* #${id}\n` +
-                        `*Items:*\n${items}` +
-                        `--------------------------\n` +
-                        `*TOTAL PAID: ₹${amt}* ✅\n` +
-                        `--------------------------\n` +
-                        `_Generated by Thirumagal Coffee House_`;
-
-    const encodedMsg = encodeURIComponent(fullMessage);
-    const waUrl = `https://wa.me/${MY_PHONE}?text=${encodedMsg}`;
-    window.open(waUrl, '_blank');
+    const fullMessage = `✅ *PAYMENT SUCCESS*\n--------------------------\n*Order ID:* #${id}\n*Items:*\n${items}--------------------------\n*TOTAL PAID: ₹${amt}* ✅\n--------------------------\n_Thirumagal Coffee House_`;
+    const waUrl = `https://wa.me/${MY_PHONE}?text=${encodeURIComponent(fullMessage)}`;
+    const win = window.open(waUrl, '_blank');
+    if (!win) document.getElementById('popup-tip').style.display = 'block';
 }

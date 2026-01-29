@@ -4,129 +4,101 @@
     --latte: #b85c38;
     --crema: #e0c097;
     --bg-cream: #fdfaf7;
-    --success: #27ae60;
-    --white: #ffffff;
-    --glass: rgba(255, 255, 255, 0.9);
 }
 
-/* Base Setup & Coffee Theme */
 html, body {
-    height: 100%;
     margin: 0;
+    padding: 0;
+    overflow-x: hidden;
     background-color: var(--bg-cream);
     background-image: url('https://www.transparenttextures.com/patterns/coffee-beans-with-coffee-beans.png');
-    font-family: 'Poppins', -apple-system, sans-serif;
-    color: var(--espresso);
-    scroll-behavior: smooth;
 }
 
 body {
-    min-height: 100svh;
-    /* Massive padding ensures the last row of items sits ABOVE the bar */
-    padding-bottom: 200px; 
+    font-family: 'Poppins', sans-serif;
+    padding-bottom: 200px; /* Buffer for checkout bar */
+    min-height: 100vh;
 }
 
-/* Dashing Item Grid */
 .menu-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    padding: 20px;
-    animation: fadeIn 0.8s ease;
+    gap: 12px;
+    padding: 15px;
 }
 
 .item-card {
-    background: var(--glass);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 18px;
     padding: 10px;
-    box-shadow: 0 10px 25px rgba(92, 61, 46, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     position: relative;
     text-align: center;
 }
 
-.item-card:active { transform: scale(0.95); }
-
 .price-tag {
     position: absolute;
-    top: 12px;
-    right: 12px;
+    top: 10px; right: 10px;
     background: linear-gradient(135deg, var(--latte), var(--roast));
     color: white;
     padding: 4px 10px;
     border-radius: 10px;
-    font-weight: 800;
-    font-size: 0.8rem;
+    font-weight: 800; font-size: 0.8rem;
     z-index: 5;
 }
 
 .item-img {
-    width: 100%;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 18px;
+    width: 100%; height: 100px;
+    object-fit: cover; border-radius: 15px;
 }
 
-/* Stylish Controller */
 .qty-controller {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between;
     background: var(--espresso);
-    border-radius: 50px;
-    margin-top: 10px;
-    padding: 4px;
+    border-radius: 50px; margin-top: 10px; padding: 4px;
+}
+
+.qty-count {
+    color: var(--crema);
+    font-weight: 800; font-size: 1.1rem;
+    min-width: 25px; text-align: center;
 }
 
 .btn-qty {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: none;
-    background: var(--crema);
-    color: var(--espresso);
-    font-weight: bold;
-    font-size: 1.2rem;
+    width: 32px; height: 32px;
+    border-radius: 50%; border: none;
+    background: var(--crema); color: var(--espresso);
+    font-weight: bold; font-size: 1.2rem;
 }
 
-/* Floating "Dashing" Checkout Bar */
 .checkout-bar {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    right: 20px;
-    background: rgba(45, 36, 36, 0.98);
-    backdrop-filter: blur(10px);
-    border-radius: 25px;
-    padding: 18px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-    display: flex;
-    flex-direction: column;
-    z-index: 1000;
-    border: 1px solid rgba(224, 192, 151, 0.2);
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--espresso);
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+    z-index: 9999;
 }
 
 .total-info {
-    display: flex;
-    justify-content: space-between;
-    color: var(--crema);
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin-bottom: 12px;
+    display: flex; justify-content: space-between;
+    color: var(--crema); margin-bottom: 12px; font-weight: bold;
 }
 
 .checkout-btn {
     background: linear-gradient(135deg, var(--latte), #d35400);
-    color: white;
-    border: none;
-    padding: 14px;
-    border-radius: 16px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    color: white; border: none; padding: 16px;
+    border-radius: 14px; font-weight: 800; width: 100%;
 }
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.payment-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(45, 36, 36, 0.7);
+    backdrop-filter: blur(8px); display: flex; align-items: flex-end; z-index: 10000;
+}
+
+.payment-card {
+    background: white; width: 100%; padding: 25px;
+    border-radius: 24px 24px 0 0;
+}
