@@ -1,123 +1,104 @@
 :root {
-    --espresso: #2d2424;
-    --roast: #5c3d2e;
-    --latte: #b85c38;
-    --crema: #e0c097;
-    --bg-cream: #fdfaf7;
+    --espresso: #2d2424;
+    --roast: #5c3d2e;
+    --latte: #b85c38;
+    --crema: #e0c097;
+    --bg-cream: #fdfaf7;
 }
 
 html, body {
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-    background-color: var(--bg-cream);
-    background-image: url('https://www.transparenttextures.com/patterns/coffee-beans-with-coffee-beans.png');
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    background-color: var(--bg-cream);
+    background-image: url('https://www.transparenttextures.com/patterns/coffee-beans-with-coffee-beans.png');
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
-    padding-bottom: 200px; /* Buffer for checkout bar */
-    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    padding-bottom: 200px; /* Buffer for checkout bar */
+    min-height: 100vh;
 }
 
 .menu-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    padding: 15px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 15px;
 }
 
 .item-card {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 18px;
-    padding: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    position: relative;
-    text-align: center;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 18px;
+    padding: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    position: relative;
+    text-align: center;
 }
 
 .price-tag {
-    position: absolute;
-    top: 10px; right: 10px;
-    background: linear-gradient(135deg, var(--latte), var(--roast));
-    color: white;
-    padding: 4px 10px;
-    border-radius: 10px;
-    font-weight: 800; font-size: 0.8rem;
-    z-index: 5;
+    position: absolute;
+    top: 10px; right: 10px;
+    background: linear-gradient(135deg, var(--latte), var(--roast));
+    color: white;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-weight: 800; font-size: 0.8rem;
+    z-index: 5;
 }
 
 .item-img {
-    width: 100%; height: 100px;
-    object-fit: cover; border-radius: 15px;
+    width: 100%; height: 100px;
+    object-fit: cover; border-radius: 15px;
 }
 
-/* Updated for Mobile Visibility */
 .qty-controller {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--espresso);
-    border-radius: 50px;
-    margin-top: 10px;
-    padding: 2px;
-    height: 36px; /* Fixed height so it doesn't collapse on mobile */
-    min-width: 100px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--espresso);
+    border-radius: 50px; margin-top: 10px; padding: 4px;
 }
 
 .qty-count {
-    color: #ffd700; /* Using a Bright Gold for maximum visibility on mobile */
-    font-weight: 800;
-    font-size: 1.2rem; /* Slightly larger for small screens */
-    min-width: 30px; 
-    text-align: center;
-    display: inline-block;
-    line-height: 1; /* Centers the number vertically */
+    color: var(--crema);
+    font-weight: 800; font-size: 1.1rem;
+    min-width: 25px; text-align: center;
 }
 
 .btn-qty {
-    width: 32px;
-    height: 32px;
-    flex-shrink: 0; /* Prevents the button from becoming an oval on mobile */
-    border-radius: 50%;
-    border: none;
-    background: var(--crema);
-    color: var(--espresso);
-    font-weight: bold;
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 50%; border: none;
+    background: var(--crema); color: var(--espresso);
+    font-weight: bold; font-size: 1.2rem;
 }
 
 .checkout-bar {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: var(--espresso);
-    border-radius: 20px 20px 0 0;
-    padding: 20px;
-    padding-bottom: calc(20px + env(safe-area-inset-bottom));
-    box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
-    z-index: 9999;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--espresso);
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+    z-index: 9999;
 }
 
 .total-info {
-    display: flex; justify-content: space-between;
-    color: var(--crema); margin-bottom: 12px; font-weight: bold;
+    display: flex; justify-content: space-between;
+    color: var(--crema); margin-bottom: 12px; font-weight: bold;
 }
 
 .checkout-btn {
-    background: linear-gradient(135deg, var(--latte), #d35400);
-    color: white; border: none; padding: 16px;
-    border-radius: 14px; font-weight: 800; width: 100%;
+    background: linear-gradient(135deg, var(--latte), #d35400);
+    color: white; border: none; padding: 16px;
+    border-radius: 14px; font-weight: 800; width: 100%;
 }
 
 .payment-overlay {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(45, 36, 36, 0.7);
-    backdrop-filter: blur(8px); display: flex; align-items: flex-end; z-index: 10000;
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(45, 36, 36, 0.7);
+    backdrop-filter: blur(8px); display: flex; align-items: flex-end; z-index: 10000;
 }
 
 .payment-card {
-    background: white; width: 100%; padding: 25px;
-    border-radius: 24px 24px 0 0;
+    background: white; width: 100%; padding: 25px;
+    border-radius: 24px 24px 0 0;
 }
