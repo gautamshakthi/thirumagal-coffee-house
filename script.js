@@ -70,6 +70,12 @@ function updateQty(id, change) {
     cart[id] = (cart[id] || 0) + change;
     if (cart[id] < 0) cart[id] = 0;
     document.getElementById(`qty-${id}`).innerText = cart[id];
+    
+    // Feedback: Make the total bounce slightly so they know it updated
+    const totalDisplay = document.getElementById('total-price');
+    totalDisplay.style.transform = "scale(1.2)";
+    setTimeout(() => totalDisplay.style.transform = "scale(1)", 200);
+    
     calculateTotal();
 }
 

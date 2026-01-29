@@ -22,16 +22,23 @@ html, body {
 
 body {
     min-height: 100svh;
-    padding-bottom: 160px;
+    margin: 0;
+    /* This padding-bottom is key: it must be taller than the checkout bar */
+    padding-bottom: 180px; 
+    box-sizing: border-box;
+    background-color: var(--bg-cream);
+    background-image: url('https://www.transparenttextures.com/patterns/coffee-beans-with-coffee-beans.png');
+    font-family: 'Poppins', sans-serif;
 }
 
-/* Smooth Menu Grid */
+/* Make the grid more compact to fit more items */
 .menu-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    padding: 20px;
-    animation: fadeIn 0.8s ease;
+    gap: 12px;
+    padding: 15px;
+    /* Ensure nothing gets stuck behind the bar */
+    margin-bottom: 20px; 
 }
 
 /* Dashing Item Cards */
@@ -100,41 +107,36 @@ body {
 
 #qty-text { color: var(--white); font-weight: bold; }
 
-/* The "Dashing" Checkout Bar */
+/* The Fixed "Compact" Checkout Bar */
 .checkout-bar {
     position: fixed;
-    bottom: 20px;
-    left: 20px;
-    right: 20px;
+    bottom: 15px; /* Slightly closer to the bottom edge */
+    left: 15px;
+    right: 15px;
     background: var(--espresso);
-    border-radius: 25px;
-    padding: 20px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     display: flex;
     flex-direction: column;
     z-index: 1000;
+    /* Adding a slight transparency so it looks lighter */
+    background: rgba(45, 36, 36, 0.98);
+    backdrop-filter: blur(5px);
 }
 
 .total-info {
     display: flex;
     justify-content: space-between;
     color: var(--crema);
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin-bottom: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 10px;
 }
 
 .checkout-btn {
-    background: linear-gradient(135deg, var(--latte), #d35400);
-    color: white;
-    border: none;
-    padding: 16px;
-    border-radius: 18px;
-    font-weight: 800;
-    font-size: 1rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    box-shadow: 0 8px 20px rgba(184, 92, 56, 0.4);
+    padding: 12px; /* Reduced padding for a sleeker look */
+    font-size: 0.9rem;
 }
 
 /* Glassmorphism Status Card */
