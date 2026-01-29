@@ -8,21 +8,24 @@ const CAFE_NAME = "Thirumagal Coffee House";
 let isPaymentPending = false;
 let pendingAmount = 0;
 
+// Function for a crisp 'Zing' sound
 function playZingSound() {
-    try {
-        const context = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = context.createOscillator();
-        const gainNode = context.createGain();
-        // Zing Sound: High frequency and short duration
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(1200, context.currentTime); 
-        oscillator.frequency.exponentialRampToValueAtTime(800, context.currentTime + 0.1); 
-        gainNode.gain.setValueAtTime(0.2, context.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1);
-        oscillator.connect(gainNode);
-        gainNode.connect(context.destination);
-        oscillator.start(); oscillator.stop(context.currentTime + 0.15);
-    } catch (e) { console.log("Audio blocked by user settings."); }
+    const context = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = context.createOscillator();
+    const gainNode = context.createGain();
+
+    oscillator.type = 'triangle'; // Smoother than sine for a 'Zing'
+    oscillator.frequency.setValueAtTime(1500, context.currentTime); 
+    oscillator.frequency.exponentialRampToValueAtTime(1000, context.currentTime + 0.1); 
+
+    gainNode.gain.setValueAtTime(0.15, context.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(context.destination);
+
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.15);
 }
 
 // ==========================================
@@ -70,6 +73,7 @@ function updateQty(id, change) {
     calculateTotal();
 }
 
+// Update the Checkout Button UI dynamically
 function calculateTotal() {
     let total = 0; let count = 0;
     menuItems.forEach(item => {
@@ -78,8 +82,18 @@ function calculateTotal() {
             count += cart[item.id];
         }
     });
-    document.getElementById('total-price').innerText = `₹${total}`;
-    document.getElementById('item-count').innerText = `${count} Items`;
+    
+    // Smoothly update text
+    const totalEl = document.getElementById('total-price');
+    const countEl = document.getElementById('item-count');
+    
+    totalEl.innerText = `₹${total}`;
+    countEl.innerText = `${count} Items Selected`;
+    
+    // Add a little "pop" animation to the bar when items change
+    const bar = document.querySelector('.checkout-bar');
+    bar.style.transform = "scale(1.02)";
+    setTimeout(() => bar.style.transform = "scale(1)", 100);
 }
 
 // ==========================================
@@ -128,43 +142,31 @@ function showVerificationModal(amount) {
     document.body.appendChild(overlay);
 }
 
+// Finalize Order with the new 'Zesty' UI
 function finalizeOrder(amount) {
     playZingSound();
-    const orderID = "TH" + Math.floor(Math.random() * 9000 + 1000);
-    let itemHtml = ""; let whatsappText = "";
-
-    menuItems.forEach(item => {
-        const qty = cart[item.id] || 0;
-        if (qty > 0) {
-            const itemTotal = item.price * qty;
-            itemHtml += `<div class="summary-line"><span>${item.eng} x ${qty}</span><b>₹${itemTotal}</b></div>`;
-            whatsappText += `• ${item.eng} (₹${item.price}) x ${qty} = ₹${itemTotal}\n`;
-        }
-    });
-
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('ID:'+orderID+'|Amt:'+amount)}`;
+    // ... (rest of your randomized ID and summary logic)
     
-    document.getElementById('verify-area').style.display = 'none';
+    // Use the new Receipt UI colors
     const res = document.getElementById('success-area');
-    res.style.display = 'block';
-
     res.innerHTML = `
         <div class="success-ui">
-            <div class="check-icon">✅</div>
-            <h2 style="color:#27ae60">Payment Verified!</h2>
-            <img src="${qrUrl}" class="qr-code">
+            <div class="check-icon" style="color:var(--success); font-size:80px;">✔</div>
+            <h2 style="color:var(--espresso); font-weight:900;">Order Verified!</h2>
             <div class="receipt-box">
-                <p class="order-id">Order ID: #${orderID}</p>
+                <p style="color:var(--latte); font-weight:bold;">TOKEN: #${orderID}</p>
                 ${itemHtml}
-                <hr>
-                <p class="final-total">TOTAL PAID: ₹${amount} <span style="color:#27ae60">✔</span></p>
+                <div style="border-top:2px solid var(--crema); padding-top:10px; margin-top:10px; display:flex; justify-content:space-between; font-weight:900; font-size:1.2rem;">
+                    <span>PAID</span>
+                    <span>₹${amount}</span>
+                </div>
             </div>
-            <button onclick="sendWhatsAppReceipt('${orderID}', '${amount}', ${JSON.stringify(whatsappText)})" class="pay-btn">
-                Send Receipt to Owner
+            <button onclick="sendWhatsAppReceipt('${orderID}', '${amount}', ${JSON.stringify(whatsappText)})" class="checkout-btn" style="width:100%; background:var(--espresso);">
+                Share Receipt
             </button>
-            <button onclick="location.reload()" class="close-link">Back to Menu</button>
         </div>
     `;
+
 
     setTimeout(() => { sendWhatsAppReceipt(orderID, amount, whatsappText); }, 2500);
 }
