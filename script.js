@@ -148,29 +148,104 @@ function finalizeOrder(amount) {
     const res = document.getElementById('success-area');
     res.style.display = 'block';
 
-    res.innerHTML = `
-        <div class="success-ui" style="text-align:center;">
-            <div class="check-icon" style="font-size:60px; color:#27ae60;">✅</div>
+    // Inside finalizeOrder (UI part)
+res.innerHTML = `
+    <div class="success-ui" style="text-align:center;">
+        <div class="check-icon-container">
+            <span class="animated-tick">✅</span>
             <h2 style="color:#2d2424">Payment Verified!</h2>
-            <img src="${qrUrl}" style="width:140px; margin:10px auto; border-radius:15px; border:2px solid #eee;">
-            <div class="receipt-box" style="background:#fdfaf7; border:2px dashed #e0c097; padding:15px; border-radius:20px; text-align:left; margin-bottom:20px;">
-                <p style="font-weight:bold; color:#b85c38;">Order #${orderID}</p>
-                ${itemHtml}
-                <hr style="border:0; border-top:1px solid #ddd; margin:10px 0;">
-                <p style="display:flex; justify-content:space-between; font-weight:bold; font-size:18px; margin:0;">
-                    <span>TOTAL</span>
-                    <span>₹${amount} ✅</span>
-                </p>
-            </div>
-            <button onclick='sendWhatsAppReceipt("${orderID}", "${amount}", ${JSON.stringify(whatsappList)})' class="checkout-btn" style="width:100%; background:#2d2424">
-                Share Receipt to WhatsApp
-            </button>
-        </div>`;
+        </div>
+        <div id="receipt-preview-container">
+             </div>
+        <button onclick='sendWhatsAppReceipt("${orderID}", "${amount}", \`${whatsappList}\`)' class="checkout-btn" style="width:100%; background:#25D366">
+            Share Visual Receipt to WhatsApp
+        </button>
+    </div>`;
 }
 
-function sendWhatsAppReceipt(id, amt, items) {
-    const fullMessage = `✅ *PAYMENT SUCCESS*\n--------------------------\n*Order ID:* #${id}\n*Items:*\n${items}--------------------------\n*TOTAL PAID: ₹${amt}* ✅\n--------------------------\n_Thirumagal Coffee House_`;
-    const waUrl = `https://wa.me/${MY_PHONE}?text=${encodeURIComponent(fullMessage)}`;
-    const win = window.open(waUrl, '_blank');
-    if (!win) document.getElementById('popup-tip').style.display = 'block';
+async function sendWhatsAppReceipt(id, amt, items) {
+    const dataUrl = await generateReceiptImage(id, amt, items);
+    
+    // Convert DataURL to File object for sharing
+    const blob = await (await fetch(dataUrl)).blob();
+    const file = new File([blob], `Receipt_${id}.png`, { type: 'image/png' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+            await navigator.share({
+                files: [file],
+                title: 'Cafe Receipt',
+                text: `Order #${id} verified.`
+            });
+        } catch (err) {
+            alert("Sharing failed. Please long-press the receipt image to save/copy.");
+        }
+    } else {
+        // Fallback: Open image in new tab for manual saving
+        const win = window.open();
+        win.document.write(`<img src="${dataUrl}" style="width:100%"><p>Long press to save & send to WhatsApp</p>`);
+    }
+}
+
+async function generateReceiptImage(orderID, amount, itemsArray) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 500;
+    canvas.height = 700;
+
+    // 1. Background & Border
+    ctx.fillStyle = '#fdfaf7'; // var(--bg-cream)
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#e0c097'; // var(--crema)
+    ctx.lineWidth = 10;
+    ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
+
+    // 2. Header
+    ctx.fillStyle = '#2d2424'; // var(--espresso)
+    ctx.font = 'bold 30px Arial';
+    ctx.fillText('Thirumagal Coffee House', 60, 60);
+
+    // 3. Security Timestamp (The "Anti-Fake" Marker)
+    const now = new Date();
+    const timestamp = `${now.toLocaleDateString()} | ${now.toLocaleTimeString()}`;
+    ctx.fillStyle = '#b85c38'; // var(--latte)
+    ctx.font = 'bold 16px Courier New';
+    ctx.fillText(`VERIFIED: ${timestamp}`, 60, 100);
+
+    // 4. Success Message & Icon
+    ctx.fillStyle = '#27ae60';
+    ctx.font = '40px Arial';
+    ctx.fillText('● PAYMENT SUCCESS', 60, 160);
+
+    // 5. Order Details
+    ctx.fillStyle = '#2d2424';
+    ctx.font = 'bold 22px Arial';
+    ctx.fillText(`Order ID: #${orderID}`, 60, 210);
+    
+    ctx.font = '18px Arial';
+    let yPos = 250;
+    itemsArray.split('\n').forEach(line => {
+        ctx.fillText(line, 60, yPos);
+        yPos += 30;
+    });
+
+    // 6. Total
+    ctx.strokeStyle = '#ddd';
+    ctx.beginPath(); ctx.moveTo(60, yPos); ctx.lineTo(440, yPos); ctx.stroke();
+    yPos += 40;
+    ctx.font = 'bold 28px Arial';
+    ctx.fillText(`TOTAL PAID: ₹${amount}`, 60, yPos);
+
+    // 7. Render QR Code onto Canvas
+    // We fetch the QR from the API and draw it
+    const qrImg = new Image();
+    qrImg.crossOrigin = "anonymous"; 
+    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ID:${orderID}`;
+    
+    return new Promise((resolve) => {
+        qrImg.onload = () => {
+            ctx.drawImage(qrImg, 175, yPos + 40, 150, 150);
+            resolve(canvas.toDataURL("image/png"));
+        };
+    });
 }
